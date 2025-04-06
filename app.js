@@ -271,6 +271,62 @@ const products = [
     created_at: "2025-02-11",
     stock: 1,
   },
+  {
+    id: "16",
+    name: "Patchouli essential oil",
+    details: "Chemical-free and synthetic-free.",
+    price: 13.90,
+    brand: "MOKOSH",
+    currency: "USD",
+    image: "uploads/mokosh-patchouli-oil-main.webp",
+    hoverImage:
+      "uploads/mokosh-patchouli-oil-hover.webp",
+    category: "essential-oils",
+    created_at: "2024-09-10",
+    stock: 5,
+  },
+  {
+    id: "17",
+    name: "Argan oil for nails",
+    details: "Strengthens nails",
+    price: 19.00,
+    brand: "MOKOSH",
+    currency: "USD",
+    image: "uploads/mokosh-argan-nail-care-main.webp",
+    hoverImage:
+      "uploads/mokosh-argan-nail-care-hover.webp",
+    category: "essential-oils",
+    created_at: "2024-09-10",
+    stock: 5,
+  },
+  {
+    id: "18",
+    name: "Shampoo Bar - coily and curly hair",
+    details: "Easy to foam",
+    price: 80.00,
+    brand: "BKIND",
+    currency: "USD",
+    image: "uploads/mokosh-argan-nail-care-main.webp",
+    hoverImage:
+      "uploads/mokosh-argan-nail-care-hover.webp",
+    category: "essential-oils",
+    created_at: "2025-04-06",
+    stock: 4,
+  },
+  {
+    id: "19",
+    name: "Nourishing hand balm - balsam, pine cedar",
+    details: "The balm contains essential oils of balsam, pine and cedar",
+    price: 96.00,
+    brand: "BKIND",
+    currency: "USD",
+    image: "uploads/bkind-nourishing-gray-main.webp",
+    hoverImage:
+      "uploads/bkind-nourishing-gray-hover.webp",
+    category: "hand-care",
+    created_at: "2025-03-15",
+    stock: 5,
+  },
 ];
 
 /***********************************************************/
