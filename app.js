@@ -306,10 +306,10 @@ const products = [
     price: 80.00,
     brand: "BKIND",
     currency: "USD",
-    image: "uploads/mokosh-argan-nail-care-main.webp",
+    image: "uploads/bkind-conditioner-gray-main.webp",
     hoverImage:
-      "uploads/mokosh-argan-nail-care-hover.webp",
-    category: "essential-oils",
+      "uploads/bkind-conditioner-gray-hover.webp",
+    category: "hair-care",
     created_at: "2025-04-06",
     stock: 4,
   },
@@ -374,7 +374,7 @@ app.post("/api/products", upload.single("productImage"), (req, res) => {
     brandImage: req.body.brandImage,
     price: req.body.price,
     currency: req.body.currency,
-    image: req.body.image,
+    image: req.file ? req.file.path : "", 
     hoverImage: req.body.hoverImage,
     category: req.body.category,
     created_at: req.body.created_at,
@@ -388,13 +388,16 @@ app.post("/api/products", upload.single("productImage"), (req, res) => {
 /***********************************************************/
 /********* PUT: UPDATE PRODUCT **********/
 /***********************************************************/
-
 app.put("/api/products/:id", upload.single("productImage"), (req, res) => {
-  //Find product
   console.log(req.params.id);
   const product = products.find((product) => product.id === req.params.id);
   if (!product) {
     return res.status(404).send("Product with given id was not found");
+  }
+
+  // Yalnız yeni şəkil yüklənibsə
+  if (req.file) {
+    product.image = req.file.path;
   }
 
   product.name = req.body.name;
@@ -403,7 +406,7 @@ app.put("/api/products/:id", upload.single("productImage"), (req, res) => {
   product.brandImage = req.body.brandImage;
   product.price = req.body.price;
   product.currency = req.body.currency;
-  product.image = req.body.image;
+  // ❌ SİL → product.image = req.body.image;
   product.hoverImage = req.body.hoverImage;
   product.category = req.body.category;
   product.created_at = req.body.created_at;
@@ -411,6 +414,7 @@ app.put("/api/products/:id", upload.single("productImage"), (req, res) => {
 
   res.send(product);
 });
+
 
 /***********************************************************/
 /********* DELETE: DELETE PRODUCT **********/
