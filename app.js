@@ -1,9 +1,10 @@
 const express = require("express");
-const Joi = require("joi");
-const app = express();
 const cors = require("cors");
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+require("dotenv").config();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -36,7 +37,7 @@ const upload = multer({
 });
 
 /*********MIDDLEWARE**********/
-
+const app = express();
 app.use(express.json());
 app.use(cors());
 app.use("/uploads", express.static("uploads"));
@@ -329,6 +330,47 @@ const products = [
   },
 ];
 
+const users = [
+  {
+    id: "1",
+    email: "leyla@gmail.com",
+    password: "123456" // Şifreyi bcrypt ile hashleyip saklamalıyız ama örnek için düz bıraktım
+  },
+];
+
+// JWT Doğrulama
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) return res.status(401).send("Access denied!");
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).send("Invalid token!");
+    req.user = user;
+    next();
+  });
+}
+
+// Giriş İşlemi
+app.post("/api/login", (req, res) => {
+  const { email, password } = req.body;
+
+  const user = users.find((u) => u.email === email);
+  if (!user) return res.status(401).send("Email or password is wrong!");
+
+  if (user.password !== password)
+    return res.status(401).send("Email or password is wrong!");
+
+  const token = jwt.sign(
+    { id: user.id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
+
+  res.send({ token });
+});
+
 /***********************************************************/
 /********* GET: ALL PRODUCTS **********/
 /***********************************************************/
@@ -363,7 +405,7 @@ app.get("/api/products/:id", (req, res) => {
 /********* POST: ADD PRODUCT **********/
 /***********************************************************/
 
-app.post("/api/products", upload.single("productImage"), (req, res) => {
+app.post("/api/products", authenticateToken, upload.single("productImage"), (req, res) => {
   // if (error) return res.status(400).send(error);
 
   const product = {
@@ -375,10 +417,10 @@ app.post("/api/products", upload.single("productImage"), (req, res) => {
     price: req.body.price,
     currency: req.body.currency,
     image: req.file ? req.file.path : "", 
-    hoverImage: req.body.hoverImage,
+    hoverImage: req.body.hoverImage || (req.file ? req.file.path : ""),
     category: req.body.category,
     created_at: req.body.created_at,
-    stock: req.body.stock,
+    stock: Number(req.body.stock) || 1,
   };
 
   products.push(product);
@@ -388,7 +430,7 @@ app.post("/api/products", upload.single("productImage"), (req, res) => {
 /***********************************************************/
 /********* PUT: UPDATE PRODUCT **********/
 /***********************************************************/
-app.put("/api/products/:id", upload.single("productImage"), (req, res) => {
+app.put("/api/products/:id", authenticateToken, upload.single("productImage"), (req, res) => {
   console.log(req.params.id);
   const product = products.find((product) => product.id === req.params.id);
   if (!product) {
@@ -407,10 +449,11 @@ app.put("/api/products/:id", upload.single("productImage"), (req, res) => {
   product.price = req.body.price;
   product.currency = req.body.currency;
   // ❌ SİL → product.image = req.body.image;
-  product.hoverImage = req.body.hoverImage;
+  hoverImage: req.body.hoverImage || (req.file ? req.file.path : ""),
   product.category = req.body.category;
   product.created_at = req.body.created_at;
-  product.stock = req.body.stock;
+  stock: Number(req.body.stock) || 1,
+
 
   res.send(product);
 });
@@ -420,7 +463,7 @@ app.put("/api/products/:id", upload.single("productImage"), (req, res) => {
 /********* DELETE: DELETE PRODUCT **********/
 /***********************************************************/
 
-app.delete("/api/products/:id", (req, res) => {
+app.delete("/api/products/:id", authenticateToken, (req, res) => {
   const product = products.find((product) => product.id === req.params.id);
   if (!product) {
     return res.status(404).send("Product with given id was not found");
