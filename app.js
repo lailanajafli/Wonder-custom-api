@@ -74,6 +74,7 @@ const products = [
     category: "face-care",
     created_at: "2025-01-10",
     stock: 5,
+    bestSeller: true,
   },
   {
     id: "3",
@@ -334,11 +335,10 @@ const users = [
   {
     id: "1",
     email: "leyla@gmail.com",
-    password: "123456" // Şifreyi bcrypt ile hashleyip saklamalıyız ama örnek için düz bıraktım
+    password: "123456"
   },
 ];
 
-// JWT Doğrulama
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -448,7 +448,7 @@ app.put("/api/products/:id", authenticateToken, upload.single("productImage"), (
   product.brandImage = req.body.brandImage;
   product.price = req.body.price;
   product.currency = req.body.currency;
-  // ❌ SİL → product.image = req.body.image;
+  //  product.image = req.body.image;
   hoverImage: req.body.hoverImage || (req.file ? req.file.path : ""),
   product.category = req.body.category;
   product.created_at = req.body.created_at;
